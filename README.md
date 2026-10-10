@@ -56,7 +56,6 @@ The Excalidraw drawings show the network boundary and the detailed request/respo
 
 ![Detailed request and response flow](docs/diagrams/system-design.png)
 
-Read [the end-to-end repository walkthrough](docs/REPO-WALKTHROUGH.md) alongside these drawings. It follows one stock-conflict report through the real functions and explains the failure paths, tests, and deployment.
 
 ## Decision rules
 
