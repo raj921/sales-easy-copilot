@@ -1,0 +1,24 @@
+{
+  "mode": "Built app HTTP test with API key intentionally absent; no provider request",
+  "update": "No customer was ill yesterday and a customer is unwell today.",
+  "status": 503,
+  "error_code": "CONFIGURATION_ERROR",
+  "passed": true,
+  "actual": {
+    "issue_category": "product_safety",
+    "urgency": "critical",
+    "evidence": [
+      {
+        "source": "field_update",
+        "status": "unverified",
+        "detail": "No customer was ill yesterday and a customer is unwell today."
+      }
+    ],
+    "recommended_next_action": "Escalate the original report immediately to the supervisor and quality/safety team. Recommend holding affected products from sale while the incident is assessed. Model analysis was unavailable.",
+    "missing_information": [
+      "A completed, grounded model assessment"
+    ],
+    "needs_human_review": true,
+    "review_reason": "DeepSeek configuration is missing or invalid. Check the server environment."
+  }
+}

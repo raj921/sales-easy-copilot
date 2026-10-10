@@ -1,0 +1,12 @@
+{
+  "case": "Provider-failure safety backstop with a negated earlier mention and affirmative later mention",
+  "update": "No customer was ill yesterday and a customer is unwell today.",
+  "test_environment": "Vitest, direct failureAnalysis call with synthetic MODEL_TIMEOUT; no provider call",
+  "expected": { "issue_category": "product_safety", "urgency": "critical", "needs_human_review": true },
+  "observed_before_fix": { "issue_category": "unknown", "urgency": "medium", "needs_human_review": true },
+  "failure": "The safety matcher inspected only the first illness word in the clause. That mention was negated, so it skipped the affirmative unwell report later in the same clause.",
+  "fix": "Iterate over all matching safety mentions and inspect the nearby negation context of each one. Preserve a critical escalation when any affirmative illness mention is present.",
+  "regression_test": "tests/policy.test.ts: does not let a negated earlier illness hide a later positive report on provider failure",
+  "observed_after_fix": { "issue_category": "product_safety", "urgency": "critical", "needs_human_review": true },
+  "limits": "This is an English keyword and nearby-negation backstop, not comprehensive natural-language or clinical understanding."
+}
