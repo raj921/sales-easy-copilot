@@ -74,7 +74,7 @@ describe("DeepSeek infrastructure (mocked, no provider calls)", () => {
     expect(create).toHaveBeenCalledWith(
       expect.objectContaining({
         response_format: { type: "json_object" },
-        max_tokens: 2048,
+        max_tokens: 4096,
         stream: false,
       }),
       { signal: expect.any(AbortSignal) },

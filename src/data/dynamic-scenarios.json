@@ -1,0 +1,28 @@
+[
+  {
+    "id": "locked-backroom",
+    "label": "Recent delivery and locked backroom",
+    "required": false,
+    "update": "Metro Fresh reports Cola 500ml is out of stock on the shelf. A delivery arrived ten minutes ago, but the backroom is locked and the duty manager has the key.",
+    "expected": {
+      "issue_category": "stock_discrepancy",
+      "urgency": "high",
+      "needs_human_review": true,
+      "stock": 48,
+      "action": "backroom"
+    }
+  },
+  {
+    "id": "late-delivery",
+    "label": "Unfamiliar delivery access issue",
+    "required": false,
+    "update": "Metro Fresh reports Cola 500ml deliveries repeatedly arrive late. The unloading gate closes before the truck arrives, and the outlet asks for a different delivery window.",
+    "expected": {
+      "issue_category": "other",
+      "urgency": "medium",
+      "needs_human_review": true,
+      "stock": 48,
+      "action": "gate"
+    }
+  }
+]

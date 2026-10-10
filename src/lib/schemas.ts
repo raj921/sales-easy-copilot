@@ -55,7 +55,7 @@ export type Analysis = z.infer<typeof analysisSchema>;
 
 const quote = z.string().min(1).max(2000).nullable();
 
-/** The model extracts claims; backend rules own the final decision. */
+/** Internal observations retain exact source quotes for evidence checks. */
 export const extractionSchema = z.strictObject({
   outlet: z.string().min(1).max(200).nullable(),
   sku: z.string().min(1).max(200).nullable(),
@@ -71,3 +71,11 @@ export const extractionSchema = z.strictObject({
 });
 
 export type Extraction = z.infer<typeof extractionSchema>;
+
+/** One model call proposes an assessment and supplies its supporting quotes. */
+export const modelAssessmentSchema = z.strictObject({
+  extraction: extractionSchema,
+  assessment: analysisSchema,
+});
+
+export type ModelAssessment = z.infer<typeof modelAssessmentSchema>;

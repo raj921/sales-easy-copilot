@@ -1,10 +1,10 @@
 # SalesEasy assessment
 
-A small Next.js sales copilot that accepts a plain-text field update and returns the assessment's seven-field JSON response. DeepSeek extracts reported observations; backend rules compare them with the supplied fictional inventory and recommend a next step. No database is needed.
+A small Next.js sales copilot that accepts a plain-text field update and returns the assessment's seven-field JSON response. DeepSeek receives the report and matched fictional inventory. It extracts observations and writes a tailored assessment. Backend checks reject unsupported evidence and decisions that violate required safety or review constraints. No database is needed.
 
 **Public demo:** [sales-easy-copilot.vercel.app](https://sales-easy-copilot.vercel.app) · **Source:** [raj921/sales-easy-copilot](https://github.com/raj921/sales-easy-copilot)
 
-No login is required. Choose a fictional sample, click **Assess field update**, and expand **View JSON output**. The deployed eight-case evaluation passed on 2026-10-10; see [deployed results](evaluation/deployed-results.json).
+No login is required. Choose a fictional sample, click **Assess field update**, and expand **View JSON output**. The current evaluation includes ten cases, including locked storage and a delivery-access problem. See [EVALUATION.md](EVALUATION.md) for measured outcomes.
 
 ## Run locally
 
@@ -28,25 +28,27 @@ Then run `npm run dev` and open http://localhost:3000. The interface offers all 
 ## How the request works
 
 1. **Input validation** (`src/lib/schemas.ts`): Zod accepts exactly `{ "update": "..." }`, trims it, and requires 1–8,000 characters. Invalid requests return HTTP 400 before calling the model.
-2. **Extraction** (`src/lib/server/analyse.ts`): one DeepSeek call extracts outlet, SKU and exact quotes for reported issues. It does not generate the final urgency or action. The field update is explicitly treated as untrusted content.
-3. **Model output validation** (`src/lib/llm/parse-response.ts`): require a completed response, valid JSON and the strict extraction schema. Empty, truncated or malformed output is rejected.
-4. **Grounding** (`src/lib/triage/policy.ts`): every extracted quote must occur verbatim in the update. Identifiers must occur after case/spacing normalization. Fabricated evidence triggers a review fallback.
-5. **Inventory comparison**: backend code loads `src/data/verified-stock.json`. Only a unique mentioned outlet/SKU pair gets a verified record. Multiple outlets/SKUs or a missing match cannot borrow inventory from another record. Stock records do not prove current shelf availability.
-6. **Decision rules**: the code owns urgency, review reasons, missing information and recommended actions. Reported claims remain unverified; numerical loss amounts are never calculated. The completed result is validated again against the final Zod schema.
-7. **Response and display**: the API returns the seven fields directly. The browser validates that response before displaying it. A provider failure is visibly labelled as a human-review fallback.
+2. **Inventory context** (`src/lib/triage/policy.ts`): match one explicitly mentioned outlet/SKU pair before the model call. Only the server supplies verified stock evidence. Unknown or multiple matches require review. Records do not prove shelf availability.
+3. **Tailored assessment** (`src/lib/server/analyse.ts`): one DeepSeek call receives `{field_update, inventory_context}`. It returns internal `{extraction, assessment}` JSON. Exact quotes support extraction. The assessment proposes all seven fields, including a situation-specific action, review reason, and missing information.
+4. **Structure validation** (`src/lib/llm/parse-response.ts`): require completed output, valid JSON, and the strict internal schema. JSON object mode does not guarantee schema compliance.
+5. **Evidence and decision checks** (`src/lib/triage/policy.ts`): require exact source quotes, unverified field evidence, and unchanged server stock evidence. Enforce minimum safety urgency, review requirements, stock-conflict classification, pricing approval, and supported numbers in the narrative. These checks are guards, not complete semantic verification.
+6. **Response and display**: retain the model-written action and explanations when checks pass. Return only the seven assessment fields. The existing browser component validates and displays these fields, including expandable JSON. Invalid proposals or provider failures return a labelled human-review fallback.
 
 ```mermaid
 flowchart LR
   A[Field update] --> B[Validate input]
-  B --> C[DeepSeek extraction]
-  C --> D[Validate JSON and quotes]
-  E[Fictional stock records] --> F[Backend decision rules]
-  D --> F
-  F --> G[Validate final assessment]
-  G --> H[JSON and interface]
-  C -. failure .-> I[Human-review fallback]
-  D -. invalid evidence .-> I
+  B --> C[Match inventory context]
+  E[Fictional stock records] --> C
+  C --> D[DeepSeek: extract and write tailored assessment]
+  D --> F[Validate structure and evidence]
+  F --> G[Check safety and review constraints]
+  G --> H[Seven-field JSON and interface]
+  D -. failure .-> I[Human-review fallback]
+  F -. invalid .-> I
+  G -. unsafe proposal .-> I
 ```
+
+For example, a shelf-stockout report can mention a recent delivery and a locked backroom. The model can recommend asking the duty manager for access and counting that delivery. A late-delivery report can instead recommend comparing truck arrival times with gate access hours. Neither successful action comes from a fixed backend recommendation template.
 
 ## Architecture drawings and code walkthrough
 
@@ -110,7 +112,7 @@ Successful responses contain exactly:
 }
 ```
 
-This example illustrates the contract; full actual responses are in `evaluation/results.json`. Malformed input returns HTTP 400 with an error. Invalid model output returns 502, unavailable configuration/provider returns 503, and timeout returns 504. These provider failures retain the seven-field assessment contract with review required and an `X-Analysis-Error` header. Upstream error bodies and secrets are not returned. A clear safety report still escalates during provider failure.
+This example illustrates the contract. Current real-provider responses are in `evaluation/dynamic-results.json`; wording can vary. Malformed input returns HTTP 400 with an error. Invalid model output returns 502, unavailable configuration/provider returns 503, and timeout returns 504. These provider failures retain the seven-field assessment contract with review required and an `X-Analysis-Error` header. Upstream error bodies and secrets are not returned. A clear safety report still escalates during provider failure.
 
 ## Verification
 
@@ -127,7 +129,7 @@ With the app running, execute the real-provider evaluation:
 EVAL_URL=http://localhost:3000 npm run eval
 ```
 
-This makes eight paid provider calls and writes expected vs actual outcomes to `evaluation/results.json`; any failure produces a nonzero exit status. It checks HTTP status, the seven-field contract, decisions, evidence provenance, stock, review reasons and relevant action constraints. The five required cases and three extra cases are shared with the interface in `src/data/scenarios.json`.
+This makes ten logical paid provider calls and writes expected vs actual outcomes to `evaluation/results.json`; any failure produces a nonzero exit status. It checks HTTP status, the seven-field contract, decisions, evidence provenance, stock, review reasons and relevant action constraints. The five required cases and three extra cases are shared with the interface in `src/data/scenarios.json`. Two additional dynamic cases are in `src/data/dynamic-scenarios.json`. Review-reason assertions accept relevant wording variants rather than requiring one template.
 
 See [EVALUATION.md](EVALUATION.md) for measured results, an observed failure and its fix. Unit/handler tests use mocks and do not call DeepSeek. Live evaluation and browser checks used the real configured provider.
 
@@ -137,11 +139,11 @@ Import this Next.js project into Vercel, use Node.js 24, and configure the four 
 
 The GitHub repository is public and connected to the Vercel project. Production uses Node.js 24 with server environment variables configured. Pushes to `main` trigger production deployments. GitHub Actions runs the mocked tests, lint, build, and TypeScript checks without a provider key. Environment changes require a new deployment. See [Vercel's Git deployment guide](https://vercel.com/docs/projects/deploy-from-cli) and [environment variable guide](https://vercel.com/docs/cli/env).
 
-GitHub publication and the public deployment are complete. The **3–5 minute demo video remains to be recorded**. For the video, explain the extraction/policy split, demonstrate stock conflict and safety, show the regression described in EVALUATION.md, and explain the limits below.
+GitHub publication and the public deployment are complete. The **3–5 minute demo video remains to be recorded**. For the video, explain model-written assessments and backend checks, demonstrate stock conflict and safety, show the regression described in EVALUATION.md, and explain the limits below.
 
 ## Limits and future improvements
 
-This is an assessment demo, not a production service. Inventory is a static fictional fixture without timestamps. Extraction and semantic classification can be wrong even when a quote is grounded. English keyword/negation safety checks are conservative backstops and are not complete language understanding. Strict quote matching can reject otherwise useful paraphrases. The eight-case provider run is a small snapshot, not a reliability guarantee. Complex multi-outlet reports require a person.
+This is an assessment demo, not a production service. Inventory is a static fictional fixture without timestamps. Extraction and semantic classification can be wrong even when a quote is grounded. English keyword/negation safety checks are conservative backstops and are not complete language understanding. Strict quote matching can reject otherwise useful paraphrases. The ten-case provider run is a small snapshot, not a reliability guarantee. Numeric checks reject new numbers, but cannot prove the meaning of a reused number. Recommendation checks remain English heuristics. A model can miss an unfamiliar risk, so this does not solve every edge case. Complex multi-outlet reports require a person.
 
 There is no persistence, authentication, rate limiting, monitoring, real inventory integration or operational review queue. A public endpoint can incur provider costs; set provider spending controls for a shared demo. For production, first add business-owned policies and fresh stock data, a larger adversarial/multilingual evaluation set, request/cost controls, and an actual review workflow. More agents and multiple model providers are unnecessary for this exercise.
 
@@ -154,4 +156,4 @@ There is no persistence, authentication, rate limiting, monitoring, real invento
 
 ## AI-tool usage
 
-OpenAI Codex assisted with implementation, documentation, debugging and evaluation. DeepSeek is the runtime extraction provider. The assessment cases and stock data are fictional. Review the implementation and its limits before submitting.
+OpenAI Codex assisted with implementation, documentation, debugging and evaluation. DeepSeek is the runtime extraction and assessment provider. The assessment cases and stock data are fictional. Review the implementation and its limits before submitting.

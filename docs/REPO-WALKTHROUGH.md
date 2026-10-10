@@ -1,6 +1,6 @@
 # Follow one report through SalesEasy
 
-Read this in small chunks. Start with the request and input check, then follow the same report through each function. The app has one pipeline, one extraction provider, and a local fictional inventory fixture.
+Read this in small chunks. Start with the request and input check, then follow the same report through each function. The app has one pipeline, one assessment provider, and a local fictional inventory fixture.
 
 ## 1. The request starts in the browser
 
@@ -24,45 +24,49 @@ Invalid input returns HTTP 400 before any paid model call. Valid input goes to `
 
 Checkpoint: What happens to `{ "update": "   " }`? It becomes an empty string and fails validation.
 
-## 3. The model extracts observations
+## 3. Match inventory and request a tailored assessment
 
-Open [`src/lib/server/analyse.ts`](../src/lib/server/analyse.ts). `analyseUpdate()` calls `requestStructuredJson()` with the extraction prompt, update, and extraction schema. Then it calls `applyPolicy()`.
+Open [`src/lib/server/analyse.ts`](../src/lib/server/analyse.ts). `analyseUpdate()` first calls `getInventoryContext()` from [`src/lib/triage/policy.ts`](../src/lib/triage/policy.ts). It matches one explicitly mentioned outlet/SKU pair against the fictional inventory. Unknown or ambiguous reports receive no verified stock record.
 
-The extraction prompt asks for the outlet, SKU, and exact quotes for stockout, sales impact, pricing, damage, illness, embedded instructions, or other observations. Missing information uses `null`. The model does not choose final urgency or action.
-
-An illustrative extraction for our report is:
+The request to DeepSeek contains both sources:
 
 ```json
 {
-  "outlet": "Metro Fresh",
-  "sku": "Cola 500ml",
-  "quotes": {
-    "stockout": "stockout of Cola 500ml",
-    "sales_impact": null,
-    "pricing": null,
-    "damage": null,
-    "illness": null,
-    "prompt_injection": null,
-    "other": null
+  "field_update": "Metro Fresh reports a stockout of Cola 500ml.",
+  "inventory_context": {
+    "record": { "outlet": "Metro Fresh", "sku": "Cola 500ml", "system_stock": 48 },
+    "ambiguous": false,
+    "verified_evidence": {
+      "source": "system_stock",
+      "status": "verified",
+      "detail": "Metro Fresh: Cola 500ml, 48 units in the supplied fictional system record. This does not verify current shelf availability."
+    }
   }
 }
 ```
 
-This illustrates the extraction contract; a live model can choose a different exact substring.
+`requestStructuredJson()` receives the assessment prompt and `modelAssessmentSchema`. The model returns an internal envelope with two parts:
+
+- `extraction`: outlet, SKU, and exact quotes for reported issues.
+- `assessment`: the full seven-field proposed result.
+
+The prompt treats the report as untrusted data. It asks for an action, review explanation, and missing information tailored to that report. Missing extraction slots use `null`. Reported claims remain unverified.
+
+For a report about a recent delivery and locked storage, the action can mention the duty manager and backroom access. A delivery-delay report can instead discuss truck arrival times and the unloading gate. These are model-written recommendations.
 
 ## 4. The SDK makes the network call
 
 Open [`src/lib/server/deepseek.ts`](../src/lib/server/deepseek.ts). The OpenAI-compatible SDK points at `https://api.deepseek.com` and sends a chat-completion request. `getDeepSeekEnv()` in [`src/lib/server/env.ts`](../src/lib/server/env.ts) validates the server configuration.
 
-The request contains a system prompt, the untrusted update, and a JSON schema. It uses JSON object mode, reasoning disabled, temperature zero, and a maximum of 2,048 output tokens. Temperature zero does not guarantee identical answers.
+The request contains a system prompt, the untrusted update, matched inventory context, and a JSON schema. It uses JSON object mode, reasoning disabled, temperature zero, and a maximum of 4,096 output tokens. Temperature zero does not guarantee identical answers.
 
-The defaults allow one SDK retry and 15 seconds per attempt. A separate 45-second abort signal bounds the overall request. There is one logical extraction call; retries may send additional network requests.
+The defaults allow one SDK retry and 15 seconds per attempt. A separate 45-second abort signal bounds the overall request. There is one logical assessment call; retries may send additional network requests.
 
 `server-only` prevents these modules from being imported into browser code. Locally the key lives in ignored `.env.local`; on Vercel it lives in a server environment variable.
 
 ## 5. Validate structure, then validate evidence
 
-[`src/lib/llm/parse-response.ts`](../src/lib/llm/parse-response.ts) requires a completed response, nonempty content, parseable JSON, and the extraction schema. JSON object mode helps the provider produce JSON; Zod checks whether that JSON has the required structure.
+[`src/lib/llm/parse-response.ts`](../src/lib/llm/parse-response.ts) requires a completed response, nonempty content, parseable JSON, and the strict internal envelope schema. JSON object mode helps the provider produce JSON; Zod checks whether that JSON has the required structure.
 
 Next, `validateGrounding()` in [`src/lib/triage/policy.ts`](../src/lib/triage/policy.ts) checks that every quote appears verbatim in the original update. Outlet and SKU must also appear after normalization. Fabricated evidence produces a 502 fallback.
 
@@ -77,25 +81,19 @@ These checks answer different questions:
 
 Grounding does not prove that a representative's claim is true or correctly classified.
 
-## 6. Backend rules make the decision
+## 6. Check the proposed decision without replacing its prose
 
-`applyPolicy()` matches one outlet and SKU against [`src/data/verified-stock.json`](../src/data/verified-stock.json). It cannot assign stock when the report names multiple outlets or SKUs.
+`validateAssessment()` checks the envelope after structure validation. Field evidence must be exact report text and remain unverified. Stock evidence must exactly match the server-supplied record. Every extracted quote must appear in the evidence list.
 
-For Metro Fresh and Cola 500ml, it finds 48 units. The stockout quote stays **unverified**. The supplied fictional stock record becomes **verified** evidence. Positive stock and a stockout claim produce:
+For Metro Fresh and Cola 500ml, a stockout quote and 48 recorded units require `stock_discrepancy`, at least `high` urgency, and human review. A model proposal that marks this conflict low urgency or skips review is rejected.
 
-```json
-{
-  "issue_category": "stock_discrepancy",
-  "urgency": "high",
-  "needs_human_review": true
-}
-```
+Safety takes priority. Recognized illness requires critical urgency. Product safety requires high urgency or above, escalation, containment, and human review. Claimed sales impact requires review even when stock is zero. Pricing recommendations require approval. Unknown records and unfamiliar operational issues require review.
 
-These are three fields from the full seven-field result. The action asks for a shelf/backroom count, record freshness, and reconciliation with the supervisor.
+The number check rejects numeric tokens absent from the report or supplied stock evidence. It does not prove that a supported number has the correct meaning. Safety and approval checks also use English text patterns. These checks cannot guarantee complete semantic correctness.
 
-Safety takes priority. Reported illness produces critical urgency; product damage produces high urgency. Pricing demands require evidence and manager approval. Claimed lost sales require missing details; the app invents no loss figure. Embedded instructions never gain authority over the assessment.
+When checks pass, the function returns the model's assessment. It preserves `recommended_next_action`, `review_reason`, and `missing_information`. Successful recommendations no longer come from backend templates.
 
-The final `analysisSchema.parse()` checks all seven fields. Human review requires a reason; no review requires a null reason. Review is advisory: the app does not notify a person or implement an approval queue.
+The final `analysisSchema.parse()` checks all seven fields. Human review requires a reason. No review requires a null reason. Review is advisory: the app does not notify a person or implement an approval queue.
 
 ## 7. The response returns to the browser
 
@@ -115,12 +113,12 @@ If the model is unavailable, the route catches `AppError` and calls `failureAnal
 
 ## 8. Tests explain what reliability means here
 
-Start with [`tests/contracts.test.ts`](../tests/contracts.test.ts) for valid and invalid input/output. Read [`tests/policy.test.ts`](../tests/policy.test.ts) for decision rules and the safety regression. [`tests/deepseek.test.ts`](../tests/deepseek.test.ts) mocks provider completion and failures. [`tests/routes.test.ts`](../tests/routes.test.ts) checks HTTP behavior. These tests make no paid calls.
+Start with [`tests/contracts.test.ts`](../tests/contracts.test.ts) for valid and invalid input/output. Read [`tests/policy.test.ts`](../tests/policy.test.ts) for assessment validation and the saved lost-sales regression. [`tests/deepseek.test.ts`](../tests/deepseek.test.ts) mocks provider completion and failures. [`tests/routes.test.ts`](../tests/routes.test.ts) checks HTTP behavior. These tests make no paid calls.
 
-[`src/data/scenarios.json`](../src/data/scenarios.json) contains the five required scenarios and three extra scenarios. [`scripts/evaluate.mjs`](../scripts/evaluate.mjs) submits them over real HTTP and checks expected versus actual results. It makes eight paid provider calls. Run it only against your intended endpoint:
+[`src/data/scenarios.json`](../src/data/scenarios.json) contains the five required scenarios and three extra scenarios. [`scripts/evaluate.mjs`](../scripts/evaluate.mjs) submits them over real HTTP and checks expected versus actual results. It also submits the two cases in `src/data/dynamic-scenarios.json`, for ten logical paid provider calls. Run it only against your intended endpoint:
 
 ```sh
-EVAL_URL=https://YOUR-DEMO.vercel.app EVAL_OUTPUT=evaluation/deployed-results.json npm run eval
+EVAL_URL=https://YOUR-DEMO.vercel.app EVAL_OUTPUT=evaluation/deployed-dynamic-results.json npm run eval
 ```
 
 Read [`EVALUATION.md`](../EVALUATION.md) for measured results and the failure/fix. A small passing evaluation is evidence for those cases, not a guarantee for arbitrary reports.
@@ -137,4 +135,4 @@ After a change, run `npm test`, `npm run typecheck`, `npm run lint`, and `npm ru
 
 ## A useful next learning exercise
 
-Trace this report without running it: **“City Corner reports a damaged Juice 1L pack and a customer feeling unwell.”** Find the priority branch in `applyPolicy()`. Explain why stock of 12 units does not reduce the safety urgency. Then submit that sample in the demo and compare your prediction with the result.
+Trace this report without running it: **“City Corner reports a damaged Juice 1L pack and a customer feeling unwell.”** Find the safety checks in `validateAssessment()`. Explain why stock of 12 units does not reduce the safety urgency. Then submit that sample in the demo and compare your prediction with the result.

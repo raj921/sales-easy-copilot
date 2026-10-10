@@ -39,7 +39,7 @@ export async function requestStructuredJson<Schema extends z.ZodType>({
         response_format: { type: "json_object" },
         reasoning_effort: "none",
         temperature: 0,
-        max_tokens: 2048,
+        max_tokens: 4096,
         stream: false,
       },
 

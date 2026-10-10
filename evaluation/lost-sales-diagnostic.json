@@ -1,0 +1,48 @@
+{
+  "note": "Fictional real-provider diagnostic. Captured before prompt fix; not an external seven-field response.",
+  "update": "Indiranagar Mart reports Cola 500ml is unavailable and claims major lost sales.",
+  "proposal": {
+    "extraction": {
+      "outlet": "Indiranagar Mart",
+      "sku": "Cola 500ml",
+      "quotes": {
+        "stockout": "Cola 500ml is unavailable",
+        "sales_impact": "claims major lost sales",
+        "pricing": null,
+        "damage": null,
+        "illness": null,
+        "prompt_injection": null,
+        "other": null
+      }
+    },
+    "assessment": {
+      "issue_category": "stockout",
+      "urgency": "medium",
+      "evidence": [
+        {
+          "source": "system_stock",
+          "status": "verified",
+          "detail": "Indiranagar Mart: Cola 500ml, 0 units in the supplied fictional system record. This does not verify current shelf availability."
+        },
+        {
+          "source": "field_update",
+          "status": "unverified",
+          "detail": "Cola 500ml is unavailable"
+        },
+        {
+          "source": "field_update",
+          "status": "unverified",
+          "detail": "claims major lost sales"
+        }
+      ],
+      "recommended_next_action": "Verify the reported stockout by conducting a physical count of Cola 500ml at Indiranagar Mart and checking recent sales and delivery records. If the stockout is confirmed, initiate standard replenishment. The claimed lost sales require validation before any impact assessment.",
+      "missing_information": [
+        "Physical count of Cola 500ml at Indiranagar Mart",
+        "Sales data for the period of reported lost sales",
+        "Recent delivery or order history for Cola 500ml"
+      ],
+      "needs_human_review": false,
+      "review_reason": null
+    }
+  }
+}

@@ -1,5 +1,40 @@
 # Evaluation record
 
+## Current tailored-assessment pipeline
+
+On 2026-10-10, the built app at `http://127.0.0.1:3120` passed **10/10 real DeepSeek cases**. DeepSeek received the report and matched inventory context. It generated both extraction and a tailored seven-field assessment. Backend validation checked evidence and mandatory decisions.
+
+The original eight cases still pass. Two new cases exercise situation-specific recommendations:
+
+| Case | Expected and actual | Tailored action |
+| --- | --- | --- |
+| locked-backroom | stock_discrepancy / high / review | Ask the duty manager for backroom access and count the recent delivery. |
+| late-delivery | other / medium / review | Check truck arrival times against unloading-gate access and review the delivery window. |
+
+See [current local results](evaluation/dynamic-results.json) for exact responses, status, timings, and assertions. Wording can vary. The responses are model-written prose, not backend success templates.
+
+### Observed model failure and prompt fix
+
+The first live run passed 7/10 evaluation checks. One was a genuine model error. DeepSeek quoted “claims major lost sales” but set human review to false. Backend validation rejected that proposal with HTTP 502 and returned a review fallback. [The captured diagnostic proposal](evaluation/lost-sales-diagnostic.json) reproduces the omission. It came from a separate real-provider replay of the same fictional input.
+
+The prompt now explicitly requires review for any claimed sales impact, even when zero stock permits routine replenishment. A regression test replays the captured proposal and verifies rejection. The next ten-case local run passed, including lost sales. This is measured improvement for these cases, not proof that the model cannot repeat the error.
+
+Two other initial failures were evaluation defects. Valid explanations used “discrepancy” instead of “conflict” and singular “instruction” instead of plural “instructions.” The checks now accept relevant wording variants. Exact category, urgency, review, schema, and evidence assertions remain. [Before-fix results](evaluation/dynamic-before-fix.json) preserve the first run.
+
+### Current automated verification
+
+- **63 tests passed**, including preservation of tailored prose, unknown logistics issues, the lost-sales regression, unsafe downgrades, provenance checks, pricing approval, and provider failures.
+- TypeScript, ESLint, and optimized build passed.
+- Browser submission displayed the locked-backroom recommendation, review explanation, evidence, and the same seven fields in expanded JSON. See [local browser capture](evaluation/dynamic-browser-local.png).
+- Number checks accept supported pack-size formatting such as `500 ml` but reject newly invented numbers.
+- Model-recognized unfamiliar product safety issues still require high urgency, containment, escalation, and review.
+
+The checks are English heuristics. They do not prove every recommendation is correct, prevent every injection, or cover all edge cases. Review remains advisory. No database or real stock system exists.
+
+## Historical extraction-only implementation
+
+The following records describe the previous fixed-recommendation pipeline. Its results remain for comparison. `evaluation/deployed-results.json` also supplies historical compliant responses to validator regression tests.
+
 Executed on 2026-10-10 against the locally running built Next.js app at `http://127.0.0.1:3119`, using the configured real DeepSeek API. All inventory and field inputs are fictional. This is a small evaluation snapshot, not a production reliability guarantee.
 
 ## Expected versus actual

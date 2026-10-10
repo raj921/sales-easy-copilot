@@ -2,12 +2,19 @@ import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { z } from "zod";
 
 const base = process.env.EVAL_URL ?? "http://127.0.0.1:3117";
-const scenarios = JSON.parse(
+const originalScenarios = JSON.parse(
   await readFile(
     new URL("../src/data/scenarios.json", import.meta.url),
     "utf8",
   ),
 );
+const dynamicScenarios = JSON.parse(
+  await readFile(
+    new URL("../src/data/dynamic-scenarios.json", import.meta.url),
+    "utf8",
+  ),
+);
+const scenarios = [...originalScenarios, ...dynamicScenarios];
 const schema = z.strictObject({
   issue_category: z.enum([
     "stockout",
@@ -37,6 +44,12 @@ const records = JSON.parse(
   ),
 );
 const results = [];
+// Evaluate the meaning of review explanations without requiring a fixed template.
+const reasonPatterns = {
+  impact: /impact|lost sales|sales loss/i,
+  conflict: /conflict|discrepan|mismatch|reconcil/i,
+  instructions: /instruction|prompt.?injection/i,
+};
 for (const scenario of scenarios) {
   const started = performance.now();
   const checks = {};
@@ -90,10 +103,9 @@ for (const scenario of scenarios) {
           (item) => item.status !== "verified",
         );
       if (expected.reason)
-        checks.review_reason =
-          actual.review_reason
-            ?.toLowerCase()
-            .includes(expected.reason.toLowerCase()) === true;
+        checks.review_reason = (
+          reasonPatterns[expected.reason] ?? new RegExp(expected.reason, "i")
+        ).test(actual.review_reason ?? "");
       if (expected.action)
         checks.next_action = actual.recommended_next_action
           .toLowerCase()
@@ -105,7 +117,9 @@ for (const scenario of scenarios) {
           );
       if (scenario.id === "safety")
         checks.no_causal_claim =
-          actual.recommended_next_action.includes("Do not infer");
+          /do not infer|do not assume|cannot (?:confirm|establish)|caus(?:e|ation).{0,30}(?:unconfirmed|not established)/i.test(
+            actual.recommended_next_action,
+          );
     }
   } catch {
     checks.request_completed = false;
@@ -135,7 +149,7 @@ for (const scenario of scenarios) {
 }
 const report = {
   executed_at: new Date().toISOString(),
-  mode: "live HTTP endpoint with configured DeepSeek provider",
+  mode: "live HTTP endpoint with DeepSeek-generated assessment and backend validation",
   base_url: base,
   passed: results.filter((result) => result.passed).length,
   total: results.length,
