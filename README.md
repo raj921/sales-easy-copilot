@@ -52,7 +52,7 @@ For example, a shelf-stockout report can mention a recent delivery and a locked 
 
 ## Architecture drawings and code walkthrough
 
-The Excalidraw drawings show the network boundary and the detailed request/response flow. Download the [editable combined drawing](docs/diagrams/sales-copilot-architecture.excalidraw) and open it in Excalidraw. [Diagram notes](docs/diagrams/README.md) explain the separately saved live-browser version.
+The updated Excalidraw drawings show the network boundary and the detailed request/response flow. Both the report and matched inventory reach DeepSeek before backend validation. Download the [editable combined drawing](docs/diagrams/sales-copilot-architecture.excalidraw) and open it in Excalidraw. [Diagram notes](docs/diagrams/README.md) explain the separately saved live-browser version.
 
 ![High-level network diagram](docs/diagrams/network-diagram.png)
 
