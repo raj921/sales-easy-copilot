@@ -4,7 +4,7 @@ A small Next.js sales copilot that accepts a plain-text field update and returns
 
 **Public demo:** [sales-easy-copilot.vercel.app](https://sales-easy-copilot.vercel.app) · **Source:** [raj921/sales-easy-copilot](https://github.com/raj921/sales-easy-copilot)
 
-No login is required. Choose a fictional sample, click **Assess field update**, and expand **View JSON output**. The current evaluation includes ten cases, including locked storage and a delivery-access problem. See [EVALUATION.md](EVALUATION.md) for measured outcomes.
+No login is required. Choose a fictional sample, click **Assess field update**, and expand **View JSON output**. All ten real-provider evaluation cases passed locally and on the public demo, including locked storage and a delivery-access problem. See [EVALUATION.md](EVALUATION.md) for measured outcomes.
 
 ## Run locally
 

@@ -31,6 +31,12 @@ Two other initial failures were evaluation defects. Valid explanations used “d
 
 The checks are English heuristics. They do not prove every recommendation is correct, prevent every injection, or cover all edge cases. Review remains advisory. No database or real stock system exists.
 
+## Current public deployment
+
+All **10/10** cases passed on [the public Vercel app](https://sales-easy-copilot.vercel.app) with real DeepSeek requests. Every case returned HTTP 200. Full expected/actual responses, checks, and timings are in [deployed dynamic results](evaluation/deployed-dynamic-results.json).
+
+The public browser also submitted the unfamiliar delivery-window report. It displayed a logistics recommendation, a tailored review explanation, missing information, and the seven-field JSON. See [hosted browser capture](evaluation/deployed-dynamic-browser.png). Anonymous homepage and health requests returned 200 without redirects. [GitHub CI](https://github.com/raj921/sales-easy-copilot/actions/runs/38071176389) passed the 63 tests and build checks on Node 24.
+
 ## Historical extraction-only implementation
 
 The following records describe the previous fixed-recommendation pipeline. Its results remain for comparison. `evaluation/deployed-results.json` also supplies historical compliant responses to validator regression tests.
