@@ -50,5 +50,5 @@
 <text x="960" y="669" text-anchor="start" fill="#000" font-size="20" font-family="Comic Sans MS,Noteworthy,Chalkboard,cursive">Server environment</text>
 <text x="960" y="694" text-anchor="start" fill="#000" font-size="20" font-family="Comic Sans MS,Noteworthy,Chalkboard,cursive">API key, model, timeout, retries</text>
 <text x="960" y="719" text-anchor="start" fill="#000" font-size="20" font-family="Comic Sans MS,Noteworthy,Chalkboard,cursive">Key never goes to the browser.</text>
-<text x="50" y="829" text-anchor="start" fill="#000" font-size="20" font-family="Comic Sans MS,Noteworthy,Chalkboard,cursive">Currently local. Vercel deployment is pending. No database or operational review queue.</text>
+<text x="50" y="829" text-anchor="start" fill="#000" font-size="20" font-family="Comic Sans MS,Noteworthy,Chalkboard,cursive">Deployed on Vercel. No database or operational review queue.</text>
 </g></svg>

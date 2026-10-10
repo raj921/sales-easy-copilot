@@ -41,10 +41,16 @@ Screenshots: [desktop](evaluation/desktop.png), [mobile](evaluation/mobile.png),
 
 ## Runtime and dependency checks
 
-The local Node binary reports **v25.6.1**; the checks above passed on that installed runtime. The project recommends Node 24 through `.nvmrc` and `engines` because it is in Vitest's supported range; Node 24 has not been separately runtime-tested here.
+The local Node binary reports **v25.6.1**; the local checks above passed on that installed runtime. The project selects Node 24 through `.nvmrc` and `engines`. The [GitHub Actions run](https://github.com/raj921/sales-easy-copilot/actions/runs/38065564630) passed the same 50 tests, lint, build, and TypeScript checks on Node 24. Vercel also built and serves the app on Node 24.
 
 `npm audit --omit=dev` reported zero vulnerabilities on 2026-10-10. The full audit reports five high-severity entries in the development lint chain, all stemming from the [braces stack-exhaustion advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm). The advisory lists no patched version, and the suggested audit fix downgrades the Next.js lint configuration to a different major. No forced downgrade was applied. This is a recorded tooling limitation, not a claim that the project is free of security risks.
 
 ## Limits
 
-This evaluation covers eight provider examples and a focused set of mocked failures. It does not establish reliability for arbitrary language, indirect prompt injections or multilingual input. Verbatim grounding proves that a quote appears in the update, not that its classification or assertion is true. Nearby-negation checks remain heuristic. There is no operational reviewer notification, database, live stock integration or published deployment.
+This evaluation covers eight provider examples and a focused set of mocked failures. It does not establish reliability for arbitrary language, indirect prompt injections or multilingual input. Verbatim grounding proves that a quote appears in the update, not that its classification or assertion is true. Nearby-negation checks remain heuristic. There is no operational reviewer notification, database, or live stock integration.
+
+## Public deployment verification
+
+On 2026-10-10, all eight cases passed against **https://sales-easy-copilot.vercel.app** using the real configured DeepSeek provider. Full expected/actual outcomes and assertions are in [evaluation/deployed-results.json](evaluation/deployed-results.json). All eight returned HTTP 200; durations ranged from 926 to 2,093 ms.
+
+The homepage and health endpoint returned HTTP 200 without authentication, cookies, or a deployment bypass. Empty, malformed, extra-field, and oversized inputs returned 400; GET on the analysis endpoint returned 405. The hosted interface was also checked in Ego Browser: a Metro Fresh stockout report displayed high urgency, stock discrepancy, human review, and the stock reconciliation action. See [the hosted browser screenshot](evaluation/deployed-browser.png).

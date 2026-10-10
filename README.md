@@ -2,6 +2,10 @@
 
 A small Next.js sales copilot that accepts a plain-text field update and returns the assessment's seven-field JSON response. DeepSeek extracts reported observations; backend rules compare them with the supplied fictional inventory and recommend a next step. No database is needed.
 
+**Public demo:** [sales-easy-copilot.vercel.app](https://sales-easy-copilot.vercel.app) · **Source:** [raj921/sales-easy-copilot](https://github.com/raj921/sales-easy-copilot)
+
+No login is required. Choose a fictional sample, click **Assess field update**, and expand **View JSON output**. The deployed eight-case evaluation passed on 2026-10-10; see [deployed results](evaluation/deployed-results.json).
+
 ## Run locally
 
 Use Node.js 24 (see `.nvmrc`).
@@ -132,7 +136,9 @@ See [EVALUATION.md](EVALUATION.md) for measured results, an observed failure and
 
 Import this Next.js project into Vercel, use Node.js 24, and configure the four server environment variables above, including `DEEPSEEK_API_KEY`. Deploy and test both the homepage and `/api/analyse`. Disable deployment protection for the assessment demo if a public URL without login is required. Redeploy after changing environment variables. Do not commit `.env.local`; `.env.example` intentionally contains no key.
 
-Deployment, GitHub publication and the 3–5 minute demo video are still submission steps; this workspace does not claim they have been completed. For the video, explain the extraction/policy split, demonstrate stock conflict and safety, show the regression described in EVALUATION.md, and explain the limits below.
+The GitHub repository is public and connected to the Vercel project. Production uses Node.js 24 with server environment variables configured. Pushes to `main` trigger production deployments. GitHub Actions runs the mocked tests, lint, build, and TypeScript checks without a provider key. Environment changes require a new deployment. See [Vercel's Git deployment guide](https://vercel.com/docs/projects/deploy-from-cli) and [environment variable guide](https://vercel.com/docs/cli/env).
+
+GitHub publication and the public deployment are complete. The **3–5 minute demo video remains to be recorded**. For the video, explain the extraction/policy split, demonstrate stock conflict and safety, show the regression described in EVALUATION.md, and explain the limits below.
 
 ## Limits and future improvements
 
