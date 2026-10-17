@@ -1,0 +1,209 @@
+{
+  "title": "Public data samples for optional SalesEasy research",
+  "client_research_date": "2026-10-17",
+  "purpose": "Real public source records for research. These samples are not used by the assessment runtime or fictional-stock fixtures.",
+  "source_status": "Fetched from original publishers. Public source publication does not independently verify every underlying observation.",
+  "samples": [
+    {
+      "source_id": "openfoodfacts-product",
+      "data_kind": "public_product_metadata",
+      "source_url": "https://world.openfoodfacts.org/api/v2/product/5449000000996.json?fields=code,product_name,brands,quantity,countries_tags,last_modified_t",
+      "source_docs": "https://openfoodfacts.github.io/documentation/docs/Product-Opener/v2/products/get-product-by-code/",
+      "fetched_at": "2026-10-17T16:51:34.369Z",
+      "source_record_modified_at": "2026-10-15T09:14:11.000Z",
+      "stock_on_hand": null,
+      "record": {
+        "brands": "COCA-COLA SERVICES SA/NV",
+        "code": "5449000000996",
+        "countries_tags": [
+          "en:albania",
+          "en:austria",
+          "en:belgium",
+          "en:bulgaria",
+          "en:canada",
+          "en:czech-republic",
+          "en:france",
+          "en:georgia",
+          "en:germany",
+          "en:ghana",
+          "en:iceland",
+          "en:india",
+          "en:italy",
+          "en:latvia",
+          "en:lithuania",
+          "en:mexico",
+          "en:morocco",
+          "en:poland",
+          "en:romania",
+          "en:senegal",
+          "en:spain",
+          "en:switzerland",
+          "en:turkey",
+          "en:ukraine",
+          "en:united-kingdom",
+          "en:united-states"
+        ],
+        "last_modified_t": 1792055651,
+        "product_name": "Coca-Cola Original",
+        "quantity": "330 ml"
+      },
+      "limitations": [
+        "Country tags are catalog information, not proof of current local stock.",
+        "This 330 ml product must not be matched to the fictional Cola 500ml SKU.",
+        "Community-contributed product metadata can be incomplete or incorrect."
+      ]
+    },
+    {
+      "source_id": "open-prices-observation",
+      "data_kind": "dated_store_price_observation",
+      "source_url": "https://prices.openfoodfacts.org/api/v1/prices?product_code=5449000000996&date__lte=2026-10-17&order_by=-date&size=1",
+      "source_docs": "https://prices.openfoodfacts.org/api/docs",
+      "fetched_at": "2026-10-17T16:54:00.472755+00:00",
+      "selection": "Latest API observation on or before client research date2026-10-17 for barcode5449000000996; source observation, not verified current stock or universal price. Contributor identities, street addresses and receipt image paths omitted.",
+      "stock_on_hand": null,
+      "record": {
+        "id": 262672,
+        "product_code": "5449000000996",
+        "product_name": null,
+        "price": 1.1,
+        "currency": "EUR",
+        "date": "2026-04-06",
+        "price_is_discounted": false,
+        "price_without_discount": null,
+        "discount_type": null,
+        "price_per": null,
+        "created": "2026-04-06T20:24:27.549329Z",
+        "updated": "2026-04-06T20:24:27.559517Z",
+        "product": {
+          "code": "5449000000996",
+          "product_name": "Coca-Cola Original",
+          "quantity": "330 ml",
+          "product_quantity": 330,
+          "product_quantity_unit": "ml"
+        },
+        "location": {
+          "id": 5641,
+          "osm_name": "HiperDino Express Alegría Barranco",
+          "osm_address_city": "Los Cristianos",
+          "osm_address_country": "España",
+          "osm_address_country_code": "ES"
+        },
+        "proof": {
+          "id": 107009,
+          "type": "PRICE_TAG",
+          "date": "2026-04-06",
+          "currency": "EUR"
+        }
+      },
+      "limitations": [
+        "This is one observed price in Spain on 2026-04-06, not a current or worldwide price.",
+        "Barcode matches the selected 330 ml catalog product, not the fictional 500ml SKU.",
+        "The source reports a price-tag proof reference; this research did not independently audit the photograph.",
+        "A product price or quantity purchased does not establish remaining store inventory."
+      ]
+    },
+    {
+      "source_id": "uci-online-retail",
+      "data_kind": "historical_sale_transactions",
+      "source_url": "https://archive.ics.uci.edu/static/public/352/online+retail.zip",
+      "source_page": "https://archive.ics.uci.edu/dataset/352/online+retail",
+      "attribution": "Chen, D. (2015). Online Retail [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5BW33.",
+      "license": "CC BY 4.0, as listed by UCI",
+      "fetched_at": "2026-10-17T16:52:33.956620+00:00",
+      "archive_sha256": "f5385cbb54bbebf7196389109c6b0621faab0c304e3702548165e71c84aede8b",
+      "archive_bytes": 23715478,
+      "transformations": [
+        "First five data rows only",
+        "CustomerID omitted",
+        "Excel invoice date converted to ISO local date-time; source supplies no time zone",
+        "Quantity and UnitPrice converted to JSON numbers"
+      ],
+      "currency_from_documentation": "GBP",
+      "records": [
+        {
+          "InvoiceNo": "536365",
+          "StockCode": "85123A",
+          "Description": "WHITE HANGING HEART T-LIGHT HOLDER",
+          "Quantity": 6,
+          "InvoiceDate": "2010-12-01T08:26:00",
+          "UnitPrice": 2.55,
+          "Country": "United Kingdom"
+        },
+        {
+          "InvoiceNo": "536365",
+          "StockCode": "71053",
+          "Description": "WHITE METAL LANTERN",
+          "Quantity": 6,
+          "InvoiceDate": "2010-12-01T08:26:00",
+          "UnitPrice": 3.39,
+          "Country": "United Kingdom"
+        },
+        {
+          "InvoiceNo": "536365",
+          "StockCode": "84406B",
+          "Description": "CREAM CUPID HEARTS COAT HANGER",
+          "Quantity": 8,
+          "InvoiceDate": "2010-12-01T08:26:00",
+          "UnitPrice": 2.75,
+          "Country": "United Kingdom"
+        },
+        {
+          "InvoiceNo": "536365",
+          "StockCode": "84029G",
+          "Description": "KNITTED UNION FLAG HOT WATER BOTTLE",
+          "Quantity": 6,
+          "InvoiceDate": "2010-12-01T08:26:00",
+          "UnitPrice": 3.39,
+          "Country": "United Kingdom"
+        },
+        {
+          "InvoiceNo": "536365",
+          "StockCode": "84029E",
+          "Description": "RED WOOLLY HOTTIE WHITE HEART.",
+          "Quantity": 6,
+          "InvoiceDate": "2010-12-01T08:26:00",
+          "UnitPrice": 3.39,
+          "Country": "United Kingdom"
+        }
+      ],
+      "stock_on_hand": null,
+      "limitations": [
+        "These five rows are 2010 UK gift-retail sales, not current FMCG inventory.",
+        "Quantity is the quantity in an invoice, not shelf or warehouse stock.",
+        "Observed sales do not establish lost sales or unfulfilled demand."
+      ]
+    },
+    {
+      "source_id": "openfda-food-enforcement",
+      "data_kind": "published_recall_enforcement_report",
+      "source_url": "https://api.fda.gov/food/enforcement.json?search=report_date%3A%5B20240101%20TO%2020261017%5D&sort=report_date%3Adesc&limit=1",
+      "source_docs": "https://open.fda.gov/apis/food/enforcement/",
+      "fetched_at": "2026-10-17T16:51:35.427Z",
+      "dataset_last_updated": "2026-10-07",
+      "stock_on_hand": null,
+      "record": {
+        "recall_number": "H-1407-2026",
+        "event_id": "99887",
+        "product_description": "Todd's Seeds Salad Sprouting Mixture - Broccoli, Mustard, Alfalfa and Cabbage, packaged in heat-sealed resealable bags in the following sizes: 1/4 lb., 1/2 lb., and 1 lb.",
+        "product_quantity": "37,481 retail units (TOTAL)",
+        "code_info": "Lot No: TS-633-2 Use By: 12/31/2029",
+        "recalling_firm": "TODD'S SEEDS LLC",
+        "country": "United States",
+        "classification": "Class I",
+        "reason_for_recall": "Products contain alfalfa seed recalled by the supplier and may be contaminated with E. coli and/or Salmonella (downstream recall)",
+        "distribution_pattern": "Nationwide; through Amazon or direct to consumer",
+        "recall_initiation_date": "20260911",
+        "report_date": "20261007",
+        "status": "Ongoing"
+      },
+      "limitations": [
+        "US regulatory dataset, not a global list of all current recalls.",
+        "Product quantity is a published recall quantity, not stock held at any outlet.",
+        "The source says not to use this dataset to issue public alerts or track recall lifecycle. Published status may be stale.",
+        "A recall record does not establish that a customer illness was caused by the product. Exact product, lot, date and geography need separate checks."
+      ]
+    }
+  ],
+  "total_source_groups": 4,
+  "total_selected_records": 8
+}

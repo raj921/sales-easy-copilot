@@ -1,0 +1,75 @@
+{
+  "executed_at": "2026-10-17T18:07:50.756Z",
+  "endpoint": "http://127.0.0.1:3119/api/products/lookup",
+  "status": 200,
+  "mode": "Real HTTP with public Open Food Facts and Open Prices sources",
+  "actual": {
+    "barcode": "5449000000996",
+    "fetched_at": "2026-10-17T18:07:44.273Z",
+    "product_status": "found",
+    "product": {
+      "name": "Coca-Cola Original",
+      "brands": "COCA-COLA SERVICES SA/NV",
+      "quantity": "330 ml",
+      "countries": [
+        "albania",
+        "austria",
+        "belgium",
+        "bulgaria",
+        "canada",
+        "czech republic",
+        "france",
+        "georgia",
+        "germany",
+        "ghana",
+        "iceland",
+        "india",
+        "italy",
+        "latvia",
+        "lithuania",
+        "mexico",
+        "morocco",
+        "poland",
+        "romania",
+        "senegal",
+        "spain",
+        "switzerland",
+        "turkey",
+        "ukraine",
+        "united kingdom",
+        "united states"
+      ],
+      "modified_at": "2026-10-15T09:14:11.000Z",
+      "source_url": "https://world.openfoodfacts.org/product/5449000000996"
+    },
+    "price_status": "available",
+    "prices": [
+      {
+        "id": 262672,
+        "amount": 1.1,
+        "currency": "EUR",
+        "observed_on": "2026-04-06",
+        "store": "HiperDino Express Alegría Barranco",
+        "city": "Los Cristianos",
+        "country": "España",
+        "discounted": false,
+        "pack_size": "330 ml",
+        "proof_type": "PRICE_TAG",
+        "source_url": "https://prices.openfoodfacts.org/api/v1/prices/262672"
+      },
+      {
+        "id": 45309,
+        "amount": 0.99,
+        "currency": "EUR",
+        "observed_on": "2024-11-15",
+        "store": "Franprix",
+        "city": "Paris",
+        "country": "France",
+        "discounted": false,
+        "pack_size": "330 ml",
+        "proof_type": "RECEIPT",
+        "source_url": "https://prices.openfoodfacts.org/api/v1/prices/45309"
+      }
+    ]
+  }
+}

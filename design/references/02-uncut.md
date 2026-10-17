@@ -1,5 +1,6 @@
-# Uncut
+# Uncut typography
 
-Source: https://uncut.wtf/
+Reviewed 17 October 2026: https://uncut.wtf/sans-serif/uncut-sans/
+Original author and font files: https://github.com/kaspernordkvist/uncut_sans
 
-Consulted 2026-10-10. The catalogue separates sans-serif, serif, monospace, and display families. Prefer readable sans-serif labels and monospace JSON. Use local system fonts for this foundation; no font asset or licensing assumption is required.
+Use self-hosted Uncut Sans variable for readable interface text and headings. Its slightly distinctive proportions suit a calm operations desk without a marketing display face. Preserve the author's SIL Open Font License in the repository. Use system monospace for JSON and small reference labels. This replaces the initial system-font choice.

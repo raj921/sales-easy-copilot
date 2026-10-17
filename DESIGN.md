@@ -31,3 +31,32 @@ Design for B2B and DialKit were attempted but were unavailable through the brows
 ## Implementation rules
 
 Read this document before implementing each screen. Keep credentials, SDKs, prompts, and decision logic in server-only modules. Product screens should describe sales decisions rather than implementation internals. The interface labels a provider failure as a human-review fallback and never presents it as a completed model assessment.
+
+## Workspace upgrade — 17 October 2026
+
+Direction: a compact field-operations desk. A dark ink navigation rail anchors a warm, light work surface. Thin rules, small numbered labels, a clear typographic hierarchy, and a restrained teal action color organize the work. Avoid decorative dashboards, invented metrics, gradients, shaders, and animation of static stock values.
+
+### Current references and decisions
+
+The six existing reference notes were refreshed against their original sites. Minimal Gallery informs whitespace and hierarchy. Search System informs clear labels and an index-like navigation rail. Uncut Sans was selected from Uncut's catalogue and its original author repository; self-host the variable WOFF2 with the original SIL OFL license. tweakcn informs semantic light/dark tokens, without adding shadcn. Paper Shaders and Number Flow were reviewed; this task does not need either dependency. DialKit and Design for B2B were unavailable in the documentation browser; do not claim their visual examples were inspected.
+
+### Screen and workflow constraints
+
+- Navigation: Field reports, Product lookup, Reference inventory. Preferences use a native modal dialog. Show active location and clear keyboard focus.
+- Field reports: report composer, fictional scenario picker, keyboard submission, cancel/retry, structured result tabs, personal information checklist, copy summary, JSON copy/download, and session-only report history.
+- Product lookup: explicit barcode lookup, public product identity, dated store price observations, source links, fetch/source dates, empty/partial/error states, and visible stale-price labels. This is independent of assessment evidence. Never imply public prices establish stock or authorize a price change.
+- Preferences: system/light/dark appearance, comfortable/compact spacing, and initial result view. Persist preferences only. Report contents and history stay in memory for this tab; no automatic browser storage of reports.
+- No invented connection, completion, accuracy, revenue, or productivity metrics. Counts must derive from fixtures or this session's actions. Human review remains advisory.
+
+### Implementation values
+
+- Typography: self-hosted Uncut Sans, 14–15px body/1.55, 30–36px main title, 20–23px panel title, 11px mono labels. System monospace for IDs and JSON. No remote font requests.
+- Light tokens: canvas `#f5f6f2`, panel `#ffffff`, text `#192b25`, muted `#65726b`, border `#dde3dc`, accent `#246b55`. Rail `#172e26`, rail text `#e6eee8`. Amber and red always include text labels.
+- Dark tokens: canvas `#14221c`, panel `#1c2d25`, text `#eef4ef`, muted `#a4b6a9`, border `#34483b`, accent `#94d4b1`. Keep warning/error text contrast readable.
+- Layout: rail 224px above 1100px; main content up to 1240px. Composer/result use 0.9fr/1.1fr columns above 1000px. Stack below that width. Main gutters 32px desktop, 16px mobile.
+- Geometry: 4px spacing base, with 8/12/16/20/24/32px increments. Panels 12px radius; controls 7px. Use border hierarchy instead of decorative shadows. Modal backdrop may dim the page.
+- Controls: at least 44px touch target; explicit labels, native buttons/inputs/selects, visible focus. Tabs support arrow/Home/End navigation. Dialog traps focus with native `showModal`, closes on Escape, and restores focus.
+- Feedback: inline accessible status, clearly labelled model fallback, cancellation, stale prices, and pending activity. No fake progress percentages. Never expose credentials or upstream error bodies.
+- Motion: color/opacity transitions up to 140ms; honor reduced motion. No continuously animated decorations.
+
+These constraints replace the starter's 960px width and system-font choices for the upgraded workspace. Keep the assessment's seven-field output and fictional inventory contract intact.

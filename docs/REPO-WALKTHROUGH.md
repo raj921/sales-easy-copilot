@@ -6,7 +6,7 @@ Read this in small chunks. Start with the request and input check, then follow t
 
 Example: **“Metro Fresh reports a stockout of Cola 500ml.”** The fictional inventory says 48 units. The app should ask someone to reconcile that conflict.
 
-[`src/app/page.tsx`](../src/app/page.tsx) renders the page, inventory table, and `Copilot` component. [`src/components/copilot.tsx`](../src/components/copilot.tsx) runs in the browser because it starts with `"use client"`. Its `submit()` function sends:
+[`src/app/page.tsx`](../src/app/page.tsx) renders the `Copilot` workspace. Its navigation switches between field reports, public product lookup, and the fictional inventory table. [`src/components/copilot.tsx`](../src/components/copilot.tsx) runs in the browser because it starts with `"use client"`. Its `submitReport()` function sends:
 
 ```json
 { "update": "Metro Fresh reports a stockout of Cola 500ml." }
@@ -97,7 +97,7 @@ The final `analysisSchema.parse()` checks all seven fields. Human review require
 
 ## 7. The response returns to the browser
 
-The route returns HTTP 200 with the assessment and `Cache-Control: no-store`. The browser validates the body with the same `analysisSchema` before rendering evidence, urgency, review status, missing information, and expandable JSON.
+The route returns HTTP 200 with the assessment and `Cache-Control: no-store`. The browser validates the body with the same `analysisSchema` before rendering evidence, urgency, review status, missing information, and the JSON tab.
 
 If the model is unavailable, the route catches `AppError` and calls `failureAnalysis()`. The fallback keeps the seven-field contract and requires human review. Clear safety reports retain safety escalation even when the provider fails.
 
@@ -136,3 +136,9 @@ After a change, run `npm test`, `npm run typecheck`, `npm run lint`, and `npm ru
 ## A useful next learning exercise
 
 Trace this report without running it: **“City Corner reports a damaged Juice 1L pack and a customer feeling unwell.”** Find the safety checks in `validateAssessment()`. Explain why stock of 12 units does not reduce the safety urgency. Then submit that sample in the demo and compare your prediction with the result.
+
+## 10. Follow a public barcode separately
+
+`src/components/product-lookup.tsx` submits `{barcode}` to `src/app/api/products/lookup/route.ts`. `src/lib/public-data-schema.ts` checks the identifier and response contracts. `src/lib/server/public-data.ts` reads Open Food Facts product metadata and Open Prices observations independently from fixed origins. Each request has an eight-second timeout and a 15-minute source-cache policy. Partial results remain usable. Dates, source links, currency and location stay visible. No stock is inferred and no lookup content is sent to DeepSeek.
+
+`src/components/assessment-panel.tsx` presents the seven-field result, evidence, JSON, copy/download controls and personal checklist. `src/components/copilot.tsx` keeps six assessments in component memory. `src/lib/preferences.ts` validates the only local-storage content: appearance, density and preferred result tab. Reloading clears reports, not preferences. `tests/public-data.test.ts` checks barcode validation, source failures, provenance, filtering and preference defaults without external calls.

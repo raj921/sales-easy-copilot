@@ -1,0 +1,26 @@
+{
+  "issue_category": "stock_discrepancy",
+  "urgency": "high",
+  "evidence": [
+    {
+      "source": "system_stock",
+      "status": "verified",
+      "detail": "Metro Fresh: Cola 500ml, 48 units in the supplied fictional system record. This does not verify current shelf availability."
+    },
+    {
+      "source": "field_update",
+      "status": "unverified",
+      "detail": "no packs on the shelf"
+    }
+  ],
+  "recommended_next_action": "Have the store manager or stock controller physically count Cola 500ml on the shelf, in the backroom, and in locked storage, then reconcile the count against the 48 units in the system record. Check whether recent deliveries or transfers were recorded but not shelved, and whether any stock is held or inaccessible. Report the verified count and any record correction to the inventory team; do not adjust stock records or place orders until the count is confirmed.",
+  "missing_information": [
+    "Physical count of Cola 500ml on shelf, backroom, and locked storage",
+    "Whether a recent delivery or transfer of Cola 500ml was received and shelved",
+    "Whether any stock is held, reserved, or inaccessible to staff",
+    "Date and time of the reported shelf check",
+    "Whether the system record reflects a recent receipt not yet put out"
+  ],
+  "needs_human_review": true,
+  "review_reason": "The field report claims no packs on the shelf while the verified system record shows 48 units, a stock discrepancy that requires a physical count and record reconciliation before any action. The shelf observation is unverified and may reflect shelving, storage, or record errors."
+}
