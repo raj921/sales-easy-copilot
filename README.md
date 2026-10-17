@@ -86,11 +86,13 @@ For example, a shelf-stockout report can mention a recent delivery and a locked 
 
 ## Architecture drawings and code walkthrough
 
-The updated Excalidraw drawings show the network boundary and the detailed request/response flow. Both the report and matched inventory reach DeepSeek before backend validation. Download the [editable combined drawing](docs/diagrams/sales-copilot-architecture.excalidraw) and open it in Excalidraw. [Diagram notes](docs/diagrams/README.md) explain the separately saved live-browser version.
+The updated Excalidraw canvas has three boards: the network overview, the assessment flow, and the separate public-data lookup flow. The assessment sends both report and matched fictional stock to DeepSeek; public lookup independently calls Open Food Facts and Open Prices. Download the [editable combined drawing](docs/diagrams/sales-copilot-architecture.excalidraw) and open it in Excalidraw. [Diagram notes](docs/diagrams/README.md) explain boundaries, failure paths and canvas controls.
 
 ![High-level network diagram](docs/diagrams/network-diagram.png)
 
-![Detailed request and response flow](docs/diagrams/system-design.png)
+![Detailed assessment request and response flow](docs/diagrams/system-design.png)
+
+![Separate public-data lookup flow](docs/diagrams/public-data-flow.png)
 
 
 ## Decision rules
